@@ -197,9 +197,7 @@ func (r *NgReader) readOption() error {
 func (r *NgReader) readSectionHeader() error {
 	if r.options.SectionEndCallback != nil && r.activeSection {
 		interfaces := make([]NgInterface, len(r.ifaces))
-		for i := range r.ifaces {
-			interfaces[i] = r.ifaces[i]
-		}
+		copy(interfaces, r.ifaces)
 		r.options.SectionEndCallback(interfaces, r.sectionInfo)
 	}
 	// clear the interfaces

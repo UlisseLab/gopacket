@@ -4,7 +4,7 @@
 // that can be found in the LICENSE file in the root of the source
 // tree.
 
-// +build ignore
+//go:build ignore
 
 // This file generates LayersDecoder function for DecodingLayerContainer
 // go run gen.go | gofmt > layers_decoder.go

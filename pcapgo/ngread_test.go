@@ -171,7 +171,7 @@ func ngRunFileReadTest(test ngFileReadTest, be string, zerocopy bool, t *testing
 			return
 		}
 
-		if bytes.Compare(data, packet.data) != 0 {
+		if !bytes.Equal(data, packet.data) {
 			t.Log(data)
 			t.Log(packet.data)
 			t.Fatalf("[packet %d] data mismatch", i)
