@@ -7,12 +7,13 @@
 package tcpassembly
 
 import (
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
 	"net"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 var netFlow gopacket.Flow
@@ -43,7 +44,7 @@ func (t *testFactory) New(a, b gopacket.Flow) Stream {
 }
 func (t *testFactory) Reassembled(r []Reassembly) {
 	t.reassembly = r
-	for i := 0; i < len(r); i++ {
+	for i := range r {
 		t.reassembly[i].Seen = time.Time{}
 	}
 }
