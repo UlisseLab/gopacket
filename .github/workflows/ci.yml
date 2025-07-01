@@ -64,7 +64,7 @@ jobs:
 
       - name: Run govet
         run: |
-          if [ -n "$(go vet ./...)"]; then;
+          if [ -n "$(go vet ./...)"]; then
             echo "Go code has vet errors, run 'go vet ./...'" >&2
             exit 1
           fi
