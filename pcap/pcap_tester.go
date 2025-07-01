@@ -4,7 +4,7 @@
 // that can be found in the LICENSE file in the root of the source
 // tree.
 
-// +build ignore
+//go:build ignore
 
 // This binary tests that PCAP packet capture is working correctly by issuing
 // HTTP requests, then making sure we actually capture data off the wire.

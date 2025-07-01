@@ -4,7 +4,7 @@
 // that can be found in the LICENSE file in the root of the source
 // tree.
 
-// +build linux
+//go:build linux
 
 // Package routing provides a very basic but mostly functional implementation of
 // a routing table for IPv4/IPv6 addresses.  It uses a routing table pulled from
