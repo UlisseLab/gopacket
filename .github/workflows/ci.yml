@@ -67,12 +67,3 @@ jobs:
             echo "Go code has vet errors, run 'go vet ./...'" >&2
             exit 1
           fi
-
-      - name: Install golint
-        run: go install golang.org/x/lint/golint@latest
-      - name: Run golint
-        run: |
-          if [ -n "$(golint ${{ env.PACKAGES }})" ]; then
-            echo "Go code has lint errors, run 'golint ./...'" >&2
-            exit 1
-          fi
