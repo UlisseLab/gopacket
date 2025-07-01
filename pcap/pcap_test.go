@@ -166,7 +166,6 @@ func TestBPFInstruction(t *testing.T) {
 		Error          bool
 		Result         bool
 	}{
-		// {"foobar", true, false},
 		{"foobar", []BPFInstruction{}, true, false},
 
 		// tcpdump -dd 'tcp[tcpflags] & (tcp-syn|tcp-ack) == (tcp-syn|tcp-ack)'
@@ -186,7 +185,7 @@ func TestBPFInstruction(t *testing.T) {
 				{0x6, 0, 0, 0x00000000},
 			}, false, true},
 
-		// tcpdump -dd 'tcp[tcpflags] & (tcp-syn|tcp-ack) == tcp-ack'
+		// tcpdump -dd 'tcp[tcpflags] & (tcp-syn|tcp-ack) == tcp-ack' --snapshot-length 65535
 		{"tcp[tcpflags] & (tcp-syn|tcp-ack) == tcp-ack",
 			[]BPFInstruction{
 				{0x28, 0, 0, 0x0000000c},
@@ -203,18 +202,18 @@ func TestBPFInstruction(t *testing.T) {
 				{0x6, 0, 0, 0x00000000},
 			}, false, true},
 
-		// tcpdump -dd 'udp'
+		// tcpdump -dd 'udp' --snapshot-length 65535
 		{"udp",
 			[]BPFInstruction{
 				{0x28, 0, 0, 0x0000000c},
-				{0x15, 0, 5, 0x000086dd},
-				{0x30, 0, 0, 0x00000014},
-				{0x15, 6, 0, 0x00000011},
-				{0x15, 0, 6, 0x0000002c},
-				{0x30, 0, 0, 0x00000036},
-				{0x15, 3, 4, 0x00000011},
-				{0x15, 0, 3, 0x00000800},
+				{0x15, 0, 2, 0x00000800},
 				{0x30, 0, 0, 0x00000017},
+				{0x15, 6, 7, 0x00000011},
+				{0x15, 0, 6, 0x000086dd},
+				{0x30, 0, 0, 0x00000014},
+				{0x15, 3, 0, 0x00000011},
+				{0x15, 0, 3, 0x0000002c},
+				{0x30, 0, 0, 0x00000036},
 				{0x15, 0, 1, 0x00000011},
 				{0x6, 0, 0, 0x0000ffff},
 				{0x6, 0, 0, 0x00000000},
@@ -240,7 +239,7 @@ func TestBPFInstruction(t *testing.T) {
 		}
 
 		if expected.Filter != "" {
-			t.Log("Testing dead bpf filter", cntr)
+			t.Log("Testing dead bpf filter", cntr, "with expression", expected.Filter)
 			if bpf, err := CompileBPFFilter(layers.LinkTypeEthernet, 65535, expected.Filter); err != nil {
 				if !expected.Error {
 					t.Error(err, "while compiling filter was unexpected")
@@ -251,7 +250,7 @@ func TestBPFInstruction(t *testing.T) {
 				if len(bpf) != len(expected.BpfInstruction) {
 					t.Errorf("expected %d instructions, got %d", len(expected.BpfInstruction), len(bpf))
 				}
-				for i := 0; i < len(bpf); i++ {
+				for i := range bpf {
 					if bpf[i] != expected.BpfInstruction[i] {
 						t.Errorf("expected instruction %d = %d, got %d", i, expected.BpfInstruction[i], bpf[i])
 					}
