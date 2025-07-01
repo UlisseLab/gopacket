@@ -293,7 +293,7 @@ func (p pcapBpfProgram) free() {
 
 func (p pcapBpfProgram) toBPFInstruction() []BPFInstruction {
 	bpfInsn := (*[bpfInstructionBufferSize]C.struct_bpf_insn)(unsafe.Pointer(p.bf_insns))[0:p.bf_len:p.bf_len]
-	bpfInstruction := make([]BPFInstruction, len(bpfInsn), len(bpfInsn))
+	bpfInstruction := make([]BPFInstruction, len(bpfInsn))
 
 	for i, v := range bpfInsn {
 		bpfInstruction[i].Code = uint16(v.code)
