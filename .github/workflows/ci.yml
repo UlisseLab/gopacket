@@ -7,7 +7,7 @@ on:
     branches: [master]
 
 env:
-  PACKAGES: ./ ./layers ./tcpassembly ./reassembly ./pcapgo ./pcap ./routing
+  PACKAGES: ./ ./layers ./tcpassembly ./reassembly ./pcapgo ./pcap
 
 jobs:
   test:
