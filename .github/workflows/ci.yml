@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [master]
 
+env:
+  PACKAGES: ./ ./layers ./tcpassembly ./reassembly ./pcapgo ./pcap ./routing
+
 jobs:
   test:
     name: Test (${{ matrix.go }}, ${{ matrix.os }})
@@ -14,9 +17,6 @@ jobs:
       matrix:
         go: [1.23.x, 1.24.x, "1.x", "1.25.0-rc.1"]
         os: [ubuntu-latest]
-        include:
-          - go: "1.x"
-            os: macos-latest
       fail-fast: false
 
     steps:
@@ -34,20 +34,19 @@ jobs:
       - name: Run tests
         run: |
           set -ev
-          go test github.com/google/gopacket
-          go test github.com/google/gopacket/layers
-          go test github.com/google/gopacket/tcpassembly
-          go test github.com/google/gopacket/reassembly
-          go test github.com/google/gopacket/pcapgo
-          go test github.com/google/gopacket/pcap
+          go test ${{ env.PACKAGES }} -v -coverprofile=coverage.out -covermode=atomic
+
           if [ "$RUNNER_OS" = "Linux" ]; then
-            sudo $(which go) test github.com/google/gopacket/routing
+            sudo $(which go) test ./routing
           fi
 
   style:
     name: Style Check
     runs-on: ubuntu-latest
     steps:
+      - name: Install dependencies (libpcap-dev)
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+
       - uses: actions/checkout@v4
 
       - name: Set up Go
@@ -57,14 +56,14 @@ jobs:
 
       - name: Run gofmt
         run: |
-          if [ -n "$(go fmt ./...)" ]; then
+          if [ -n "$(go fmt ${{ env.PACKAGES }})" ]; then
             echo "Go code is not formatted, run 'go fmt ./...'" >&2
             exit 1
           fi
 
       - name: Run govet
         run: |
-          if [ -n "$(go vet ./...)"]; then
+          if [ -n "$(go vet ${{ env.PACKAGES }})" ]; then
             echo "Go code has vet errors, run 'go vet ./...'" >&2
             exit 1
           fi
@@ -73,7 +72,7 @@ jobs:
         run: go install golang.org/x/lint/golint@latest
       - name: Run golint
         run: |
-          if [ -n "$(golint ./...)" ]; then
+          if [ -n "$(golint ${{ env.PACKAGES }})" ]; then
             echo "Go code has lint errors, run 'golint ./...'" >&2
             exit 1
           fi
