@@ -7,6 +7,7 @@ package pcapgo
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 	"testing"
@@ -119,7 +120,7 @@ func TestBadPacketHeader(t *testing.T) {
 	equalNil(t, err)
 	buf[23] = 0x2C
 	_, _, err = handle.ReadPacketData()
-	equalError(t, err, fmt.Errorf(originalLenExceeded))
+	equalError(t, err, errors.New(originalLenExceeded))
 	buf[23] = 0x2A
 }
 
@@ -133,7 +134,7 @@ func TestBigPacketData(t *testing.T) {
 	buf[23] = 0x00
 	buf[22] = 0x11
 	_, _, err = handle.ReadPacketData()
-	equalError(t, err, fmt.Errorf(captureLenExceeded))
+	equalError(t, err, errors.New(captureLenExceeded))
 	buf[23] = 0x44
 	buf[22] = 0x00
 	buf[19] = 0x44
