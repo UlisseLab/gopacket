@@ -442,10 +442,7 @@ func (p pcapDevices) free() {
 func (p *pcapDevices) next() bool {
 	if p.cur == nil {
 		p.cur = p.all
-		if p.cur == nil {
-			return false
-		}
-		return true
+		return p.cur != nil
 	}
 	if p.cur.next == nil {
 		return false
@@ -473,10 +470,7 @@ type pcapAddresses struct {
 func (p *pcapAddresses) next() bool {
 	if p.cur == nil {
 		p.cur = p.all
-		if p.cur == nil {
-			return false
-		}
-		return true
+		return p.cur != nil
 	}
 	if p.cur.next == nil {
 		return false
@@ -506,8 +500,7 @@ func (p pcapDevices) addresses() pcapAddresses {
 }
 
 func pcapFindAllDevs() (pcapDevices, error) {
-	var buf *C.char
-	buf = (*C.char)(C.calloc(errorBufferSize, 1))
+	buf := (*C.char)(C.calloc(errorBufferSize, 1))
 	defer C.free(unsafe.Pointer(buf))
 	var alldevsp pcapDevices
 
@@ -617,7 +610,7 @@ func (p *InactiveHandle) pcapListTstampTypes() (out []TimestampSource) {
 	}
 	defer C.pcap_free_tstamp_types(types)
 	typesArray := (*[1 << 28]C.int)(unsafe.Pointer(types))
-	for i := 0; i < n; i++ {
+	for i := range n {
 		out = append(out, TimestampSource((*typesArray)[i]))
 	}
 	return
@@ -637,7 +630,7 @@ func (p *InactiveHandle) pcapSetRfmon(monitor bool) error {
 	}
 	switch canset := C.pcap_can_set_rfmon(p.cptr); canset {
 	case 0:
-		return CannotSetRFMon
+		return ErrCannotSetRFMon
 	case 1:
 		// success
 	default:

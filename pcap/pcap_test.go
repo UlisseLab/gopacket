@@ -9,7 +9,6 @@ package pcap
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -37,14 +36,14 @@ func TestPcapFileRead(t *testing.T) {
 		0xAB, 0xAD, 0x1D, 0xEA,
 	}
 
-	invalidPcap, err := ioutil.TempFile("", "invalid.pcap")
+	invalidPcap, err := os.CreateTemp("", "invalid.pcap")
 	if err != nil {
 		t.Fatal(err)
 	}
 	invalidPcap.Close() // if the file is still open later, the invalid test fails with permission denied on windows
 	defer os.Remove(invalidPcap.Name())
 
-	err = ioutil.WriteFile(invalidPcap.Name(), invalidData, 0644)
+	err = os.WriteFile(invalidPcap.Name(), invalidData, 0644)
 	if err != nil {
 		t.Fatal(err)
 	}
