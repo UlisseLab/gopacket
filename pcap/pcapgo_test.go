@@ -8,17 +8,18 @@ package pcap
 
 import (
 	"bytes"
-	"github.com/google/gopacket"
-	"github.com/google/gopacket/layers"
-	"github.com/google/gopacket/pcapgo"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcapgo"
 )
 
 func TestPCAPGoWrite(t *testing.T) {
-	f, err := ioutil.TempFile("", "pcapgo")
+	f, err := os.CreateTemp("", "pcapgo")
 	if err != nil {
 		t.Fatal(err)
 	}
