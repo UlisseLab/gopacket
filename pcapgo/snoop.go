@@ -22,11 +22,11 @@ const snoopVersion uint32 = 2
 const maxCaptureLen int = 4096
 
 // Errors
-const unknownMagic = "Unknown Snoop Magic Bytes"
-const unknownVersion = "Unknown Snoop Format Version"
-const unkownLinkType = "Unknown Link Type"
-const originalLenExceeded = "Capture length exceeds original packet length"
-const captureLenExceeded = "Capture length exceeds max capture length"
+const unknownMagic = "unknown Snoop Magic Bytes"
+const unknownVersion = "unknown Snoop Format Version"
+const unkownLinkType = "unknown Link Type"
+const originalLenExceeded = "capture length exceeds original packet length"
+const captureLenExceeded = "capture length exceeds max capture length"
 
 type snoopHeader struct {
 	Version  uint32
@@ -95,7 +95,7 @@ func (r *SnoopReader) readHeader() error {
 	if n, err := io.ReadFull(r.r, buf); err != nil {
 		return err
 	} else if n < 16 {
-		return errors.New("Not enough data for read")
+		return errors.New("not enough data for read")
 	}
 
 	if magic := binary.BigEndian.Uint64(buf[0:8]); magic != snoopMagic {
