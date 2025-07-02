@@ -13,7 +13,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"reflect"
 	"runtime"
 	"strconv"
 	"sync"
@@ -363,10 +362,7 @@ func (p *Handle) ZeroCopyReadPacketData() (data []byte, ci gopacket.CaptureInfo,
 	p.mu.Lock()
 	err = p.getNextBufPtrLocked(&ci)
 	if err == nil {
-		slice := (*reflect.SliceHeader)(unsafe.Pointer(&data))
-		slice.Data = uintptr(unsafe.Pointer(p.bufptr))
-		slice.Len = ci.CaptureLength
-		slice.Cap = ci.CaptureLength
+		data = unsafe.Slice(p.bufptr, ci.CaptureLength)
 	}
 	p.mu.Unlock()
 	if err == NextErrorTimeoutExpired {
@@ -670,7 +666,7 @@ func findalladdresses(addresses pcapAddresses) (retval []InterfaceAddress) {
 
 func sockaddrToIP(rsa *syscall.RawSockaddr) (IP []byte, err error) {
 	if rsa == nil {
-		err = errors.New("Value not set")
+		err = errors.New("value not set")
 		return
 	}
 	switch rsa.Family {
@@ -689,7 +685,7 @@ func sockaddrToIP(rsa *syscall.RawSockaddr) (IP []byte, err error) {
 		}
 		return
 	}
-	err = errors.New("Unsupported address type")
+	err = errors.New("unsupported address type")
 	return
 }
 
@@ -711,7 +707,7 @@ const (
 // SetDirection sets the direction for which packets will be captured.
 func (p *Handle) SetDirection(direction Direction) error {
 	if direction != DirectionIn && direction != DirectionOut && direction != DirectionInOut {
-		return fmt.Errorf("Invalid direction: %v", direction)
+		return fmt.Errorf("invalid direction: %v", direction)
 	}
 	return p.pcapSetdirection(direction)
 }
@@ -855,9 +851,10 @@ func (p *InactiveHandle) SetTimestampSource(t TimestampSource) error {
 	return p.pcapSetTstampType(t)
 }
 
-// CannotSetRFMon is returned by SetRFMon if the handle does not allow
+// ErrCannotSetRFMon is returned by SetRFMon if the handle does not allow
 // setting RFMon because pcap_can_set_rfmon returns 0.
-var CannotSetRFMon = errors.New("Cannot set rfmon for this handle")
+var ErrCannotSetRFMon = errors.New("cannot set rfmon for this handle")
+var CannotSetRFMon = ErrCannotSetRFMon // Deprecated: use ErrCannotSetRFMon instead
 
 // SetRFMon turns on radio monitoring mode, similar to promiscuous mode but for
 // wireless networks.  If this mode is enabled, the interface will not need to
