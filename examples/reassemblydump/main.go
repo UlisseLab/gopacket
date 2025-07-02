@@ -17,7 +17,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -121,22 +120,22 @@ var errorsMapMutex sync.Mutex
 var errors uint
 
 // Too bad for perf that a... is evaluated
-func Error(t string, s string, a ...interface{}) {
+func Error(t string, s string, a ...any) {
 	errorsMapMutex.Lock()
 	errors++
-	nb, _ := errorsMap[t]
+	nb := errorsMap[t]
 	errorsMap[t] = nb + 1
 	errorsMapMutex.Unlock()
 	if outputLevel >= 0 {
 		fmt.Printf(s, a...)
 	}
 }
-func Info(s string, a ...interface{}) {
+func Info(s string, a ...any) {
 	if outputLevel >= 1 {
 		fmt.Printf(s, a...)
 	}
 }
-func Debug(s string, a ...interface{}) {
+func Debug(s string, a ...any) {
 	if outputLevel >= 2 {
 		fmt.Printf(s, a...)
 	}
@@ -154,7 +153,7 @@ func (h *httpReader) run(wg *sync.WaitGroup) {
 				Error("HTTP-request", "HTTP/%s Request error: %s (%v,%+v)\n", h.ident, err, err, err)
 				continue
 			}
-			body, err := ioutil.ReadAll(req.Body)
+			body, err := io.ReadAll(req.Body)
 			s := len(body)
 			if err != nil {
 				Error("HTTP-request-body", "Got body err: %s\n", err)
@@ -182,7 +181,7 @@ func (h *httpReader) run(wg *sync.WaitGroup) {
 				Error("HTTP-response", "HTTP/%s Response error: %s (%v,%+v)\n", h.ident, err, err, err)
 				continue
 			}
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			s := len(body)
 			if err != nil {
 				Error("HTTP-response-body", "HTTP/%s: failed to get body(parsed len:%d): %s\n", h.ident, s, err)
